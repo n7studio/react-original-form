@@ -1,0 +1,10 @@
+{
+  "name": "ui-web-ui-atom",
+  "version": "0.0.1",
+  "description": "ui-atom web project",
+  "private": true,
+  "dependencies": {
+    "@ionic/react": "^6.0.0",
+    "ionicons": "^5.4.0"
+  }
+}
