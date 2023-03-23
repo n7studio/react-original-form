@@ -1,7 +1,7 @@
 import React, { ReactElement, ReactNode } from "react";
-import { Control, Controller } from "react-hook-form";
+import { Control, Controller, FieldValues } from "react-hook-form";
 
-interface RenderChildParams<T> {
+interface RenderChildParams<T extends FieldValues> {
   child: ReactNode | ReactElement | undefined;
   control: Control<T>;
 }
@@ -28,7 +28,7 @@ function isReactElementWithChildren(
   );
 }
 
-function renderFormChild<T>({
+function renderFormChild<T extends FieldValues>({
   child,
   control,
 }: RenderChildParams<T>): React.ReactNode {

@@ -6,38 +6,41 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
-import renderFormChild from "../../utils";
-import { DeepPartial, FormProvider, useForm } from "react-hook-form";
+import { renderFormChild } from "../../utils";
+import {
+  DeepPartial,
+  FieldValues,
+  FormProvider,
+  useForm,
+} from "react-hook-form";
 
-interface FormProps<T> {
+type FormProps<T extends FieldValues> = {
   children: ReactElement | ReactElement[] | ReactNode | ReactNode[];
   onSubmit: (data: T) => void;
   defaultValues?: DeepPartial<T>;
-}
+};
 
-function FormInner<T>(
+type FormRef = {
+  submit: () => void;
+};
+
+function FormInner<T extends FieldValues>(
   { children, onSubmit, defaultValues }: FormProps<T>,
-  ref?: Ref<ReactNode>,
-): JSX.Element {
+  ref?: Ref<FormRef>,
+) {
   const { handleSubmit, control, ...rest } = useForm({
     defaultValues,
   });
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  useImperativeHandle(
-    ref,
-    () => {
-      return {
-        submit: () => {
-          formRef?.current?.dispatchEvent(
-            new Event("submit", { bubbles: true, cancelable: true }),
-          );
-        },
-      };
+  useImperativeHandle(ref, () => ({
+    submit: () => {
+      formRef?.current?.dispatchEvent(
+        new Event("submit", { bubbles: true, cancelable: true }),
+      );
     },
-    [],
-  );
+  }));
 
   return (
     <FormProvider
@@ -59,8 +62,8 @@ function FormInner<T>(
   );
 }
 
-const Form = forwardRef(FormInner) as <T>(
-  props: FormProps<T> & { ref?: Ref<ReactNode> },
+const Form = forwardRef(FormInner) as <T extends FieldValues>(
+  props: FormProps<T> & { ref?: Ref<FormRef> },
 ) => ReturnType<typeof FormInner>;
 
 export default Form;
