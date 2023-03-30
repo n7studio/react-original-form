@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import renderFormChild from "../../utils";
+import { renderFormChild } from "../../utils";
 import { useFormContext } from "react-hook-form";
 
 interface FormPartialProps {
