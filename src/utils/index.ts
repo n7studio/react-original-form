@@ -1,1 +1,1 @@
-export { default } from "./renderFormChild";
+export { default as renderFormChild } from "./renderFormChild";

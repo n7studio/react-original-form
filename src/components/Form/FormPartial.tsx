@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import renderFormChild from "../../utils";
+import { renderFormChild } from "../../utils";
 import { useFormContext } from "react-hook-form";
 
 interface FormPartialProps {
@@ -7,12 +7,21 @@ interface FormPartialProps {
 }
 
 function FormPartial({ children }: FormPartialProps): JSX.Element {
-  const { control } = useFormContext();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useFormContext();
 
   return (
     <>
       {React.Children.map(children, (child: ReactNode) => {
-        return renderFormChild({ child, control });
+        return renderFormChild({
+          child,
+          control,
+          handleSubmit,
+          errors,
+        });
       })}
     </>
   );

@@ -1,74 +1,109 @@
-import React, { ReactElement, ReactNode } from "react";
-import { Control, Controller } from "react-hook-form";
-
-interface RenderChildParams<T> {
-  child: ReactNode | ReactElement | undefined;
-  control: Control<T>;
-}
+import type { ReactElement, ReactNode } from "react";
+import React from "react";
+import {
+  Control,
+  Controller,
+  FieldErrors,
+  FieldValues,
+  UseFormHandleSubmit,
+} from "react-hook-form";
+import { flattenFormErrors, hasNestedErrors } from "./flattenFormErrors";
 
 function isInputElement(reactNode: ReactNode): reactNode is ReactElement {
-  const element = reactNode as ReactElement;
-  return (
-    element &&
-    element.props &&
-    element.props.name !== undefined &&
-    element.props.type !== "submit"
-  );
+  const props = (reactNode as ReactElement)?.props;
+  return props?.name !== undefined;
 }
 
-function isReactElementWithChildren(
-  reactNode: ReactNode,
-): reactNode is ReactElement {
-  const element = reactNode as ReactElement;
-  return (
-    element &&
-    element.props !== undefined &&
-    element.props.name === undefined &&
-    React.Children.toArray(element.props.children).length >= 1
-  );
+function isSubmitButton(reactNode: ReactNode): reactNode is ReactElement {
+  const props = (reactNode as ReactElement)?.props;
+  return props?.submit === true;
+}
+
+interface RenderFormChildParams<T> {
+  child: ReactNode;
+  control: Control<FieldValues, any>;
+  onSubmit?: (values: T) => void;
+  handleSubmit: UseFormHandleSubmit<FieldValues>;
+  errors: FieldErrors;
+  parent?: ReactNode;
 }
 
 function renderFormChild<T>({
   child,
   control,
-}: RenderChildParams<T>): React.ReactNode {
-  if (isReactElementWithChildren(child)) {
-    const nestedChildren = React.Children.toArray(child.props.children);
-    const children = React.Children.map(nestedChildren, (child: ReactNode) => {
-      return renderFormChild({ child, control });
-    });
+  onSubmit,
+  handleSubmit,
+  errors,
+  parent,
+}: RenderFormChildParams<T>): ReactNode | ReactNode[] {
+  const nestedChildren =
+    React.isValidElement(child) &&
+    React.Children.toArray(child?.props.children);
+
+  if (nestedChildren && nestedChildren.length) {
+    const parent = child;
+
+    const { ...parentProps } = parent?.props as {
+      children?: ReactNode;
+    };
 
     return React.createElement(
-      child.type,
-      {
-        ...child.props,
-      },
-      children,
+      parent.type,
+      parentProps,
+      React.Children.map(nestedChildren, (child: ReactNode) => {
+        return renderFormChild({
+          child,
+          control,
+          onSubmit,
+          handleSubmit,
+          errors,
+          parent,
+        });
+      }),
     );
-  } else if (isInputElement(child)) {
+  }
+
+  if (isInputElement(child)) {
     const { name, ...rest } = child.props;
+
+    errors = hasNestedErrors(errors) ? flattenFormErrors(errors) : errors;
+
     return (
       <Controller
         key={name}
         control={control}
         name={name}
-        defaultValue={rest?.value}
-        render={({ field }) => {
-          return React.createElement(child.type, {
+        render={({ field }) =>
+          React.createElement(child.type, {
             ...rest,
             ...field,
             onChange: (e: CustomEvent) => {
               rest?.onChange?.(e);
               field.onChange(e);
             },
+            error: errors[name],
             ref: undefined,
-          });
-        }}
+          })
+        }
       />
     );
   }
 
+  if (isSubmitButton(child)) {
+    return React.createElement(child.type, {
+      ...child.props,
+      onPress: handleSubmit((values) => onSubmit?.(values as T)),
+      ref: undefined,
+    });
+  }
+
+  if (typeof child === "string" && React.isValidElement(parent)) {
+    return React.createElement(parent.type, {
+      ...parent.props,
+      ref: undefined,
+    });
+  }
+
   return child;
 }
-
 export default renderFormChild;
