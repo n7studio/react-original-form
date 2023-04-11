@@ -1,5 +1,5 @@
 {
-  "name": "react-original-form",
+  "name": "@n7studio/react-original-form",
   "version": "0.0.1",
   "description": "The form based on react hook form",
   "private": false,
