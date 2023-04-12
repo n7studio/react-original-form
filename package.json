@@ -1,6 +1,6 @@
 {
   "name": "@n7studio/react-original-form",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The form based on react hook form",
   "private": false,
   "main": "./dist/cjs/index.js",
@@ -20,6 +20,7 @@
     "lint --fix": "eslint \"{**/*,*}.{js,ts,jsx,tsx}\"",
     "prettier": "prettier --write --ignore-unknown .",
     "test": "jest --config jest.config.ts",
+    "prepublishOnly": "yarn test && yarn prettier && yarn lint",
     "prepare": "husky install"
   },
   "devDependencies": {
