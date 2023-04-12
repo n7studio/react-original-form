@@ -54,11 +54,6 @@ function FormInner<T extends FieldValues>(
   const formRef = useRef<HTMLFormElement>(null);
 
   useImperativeHandle(ref, () => ({
-    submit: () => handleSubmit((values) => onSubmit?.(values as T))(),
-    reset: (resetData: FieldValues) => reset(resetData),
-  }));
-
-  useImperativeHandle(ref, () => ({
     submit: () => {
       formRef?.current?.dispatchEvent(
         new Event("submit", { bubbles: true, cancelable: true }),
