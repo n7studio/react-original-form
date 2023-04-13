@@ -24,6 +24,7 @@ type FormProps<T extends FieldValues> = {
 
 type FormRef = {
   submit: () => void;
+  reset: (resetData: FieldValues) => void;
 };
 
 function FormInner<T extends FieldValues>(

@@ -1,6 +1,6 @@
 {
   "name": "@n7studio/react-original-form",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "The form based on react hook form",
   "private": false,
   "main": "./dist/cjs/index.js",
@@ -26,6 +26,7 @@
   "devDependencies": {
     "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.5.0",
+    "@types/node": "^18.15.11",
     "@types/react": "^18.0.28",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.56.0",
@@ -50,8 +51,8 @@
     "yup": "^0.32.11"
   },
   "peerDependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "^17 || ^18",
+    "react-dom": "^17 || ^18",
     "react-hook-form": "^7.43.7",
     "yup": "^0.32.11"
   },
