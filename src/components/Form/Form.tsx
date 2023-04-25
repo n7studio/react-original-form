@@ -8,12 +8,15 @@ import React, {
 import { renderFormChild } from "../../utils";
 import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
 import { useOnWatchForm } from "../../hooks";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
 
 type FormProps<T extends FieldValues> = {
   children: ReactNode | ReactNode[];
   onSubmit?: (values: T) => void;
   defaultValues?: T;
   resolver?: Resolver<FieldValues, any> | undefined;
+  validationSchema?: yup.AnyObjectSchema;
   mode?: "onBlur" | "onChange" | "onSubmit" | "onTouched" | "all";
   onWatch?: (values: T) => void;
   watch?: {
@@ -28,7 +31,15 @@ type FormRef = {
 };
 
 function FormInner<T extends FieldValues>(
-  { children, onSubmit, defaultValues, resolver, mode, watch }: FormProps<T>,
+  {
+    children,
+    onSubmit,
+    defaultValues,
+    resolver,
+    mode,
+    watch,
+    validationSchema,
+  }: FormProps<T>,
   ref?: Ref<FormRef>,
 ) {
   const {
@@ -41,7 +52,7 @@ function FormInner<T extends FieldValues>(
   } = useForm({
     mode: mode,
     defaultValues: defaultValues as FieldValues,
-    resolver: resolver,
+    resolver: resolver ?? (validationSchema && yupResolver(validationSchema)),
   });
 
   useOnWatchForm(
