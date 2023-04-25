@@ -4,7 +4,7 @@ The form based on react hook form
 
 ### Install
 
-    yarn add @n7studio/react-original-form react-hook-form yup
+    yarn add @n7studio/react-original-form react-hook-form yup @hookform/resolvers
 
 ### Quickstart
 

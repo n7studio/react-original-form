@@ -1,6 +1,6 @@
 {
   "name": "@n7studio/react-original-form",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "The form based on react hook form",
   "private": false,
   "main": "./dist/cjs/index.js",
@@ -24,6 +24,7 @@
     "prepare": "husky install"
   },
   "devDependencies": {
+    "@hookform/resolvers": "^3.1.0",
     "@testing-library/react": "^14.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^18.15.11",
@@ -54,7 +55,8 @@
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18",
     "react-hook-form": "^7.43.7",
-    "yup": "^0.32.11"
+    "yup": "^0.32.11",
+    "@hookform/resolvers": "^3.1.0"
   },
   "keywords": [
     "react",
