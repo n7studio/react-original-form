@@ -6,7 +6,13 @@ import React, {
   useRef,
 } from "react";
 import { renderFormChild } from "../../utils";
-import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
+import {
+  FieldErrors,
+  FieldValues,
+  FormProvider,
+  Resolver,
+  useForm,
+} from "react-hook-form";
 import { useOnWatchForm } from "../../hooks";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -23,6 +29,7 @@ type FormProps<T extends FieldValues> = {
     fields?: string[];
     onChange: (value: Array<any> | T) => void;
   };
+  onInvalid?: (errors: FieldErrors<FieldValues>) => void;
 };
 
 type FormRef = {
@@ -39,6 +46,7 @@ function FormInner<T extends FieldValues>(
     mode,
     watch,
     validationSchema,
+    onInvalid,
   }: FormProps<T>,
   ref?: Ref<FormRef>,
 ) {
@@ -65,6 +73,12 @@ function FormInner<T extends FieldValues>(
 
   const formRef = useRef<HTMLFormElement>(null);
 
+  function submitHandler() {
+    Object.keys(formState.errors).length && onInvalid?.(formState.errors);
+
+    handleSubmit((values) => onSubmit?.(values as T))();
+  }
+
   useImperativeHandle(ref, () => ({
     submit: () => {
       formRef?.current?.dispatchEvent(
@@ -85,10 +99,7 @@ function FormInner<T extends FieldValues>(
         ...rest,
       }}
     >
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit((values) => onSubmit?.(values as T))}
-      >
+      <form ref={formRef} onSubmit={submitHandler}>
         {React.Children.map(children, (child: ReactNode) => {
           return renderFormChild({
             child,
