@@ -2,11 +2,18 @@ import React, {
   forwardRef,
   ReactNode,
   Ref,
+  useEffect,
   useImperativeHandle,
   useRef,
 } from "react";
 import { renderFormChild } from "../../utils";
-import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
+import {
+  FieldErrors,
+  FieldValues,
+  FormProvider,
+  Resolver,
+  useForm,
+} from "react-hook-form";
 import { useOnWatchForm } from "../../hooks";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -23,6 +30,7 @@ type FormProps<T extends FieldValues> = {
     fields?: string[];
     onChange: (value: Array<any> | T) => void;
   };
+  onInvalid?: (errors: FieldErrors<FieldValues>) => void;
 };
 
 type FormRef = {
@@ -39,6 +47,7 @@ function FormInner<T extends FieldValues>(
     mode,
     watch,
     validationSchema,
+    onInvalid,
   }: FormProps<T>,
   ref?: Ref<FormRef>,
 ) {
@@ -73,6 +82,12 @@ function FormInner<T extends FieldValues>(
     },
     reset: (resetData: FieldValues) => reset(resetData),
   }));
+
+  useEffect(() => {
+    if (!Object.keys(formState.errors).length) return;
+
+    onInvalid?.(formState.errors);
+  }, [JSON.stringify(formState.errors)]);
 
   return (
     <FormProvider
