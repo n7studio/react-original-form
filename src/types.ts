@@ -1,6 +1,6 @@
 import { FieldValues } from "react-hook-form";
 
-export type FormElement = {
+export type FormRef = {
   submit: () => void;
   reset: (resetData?: FieldValues) => void;
 };
