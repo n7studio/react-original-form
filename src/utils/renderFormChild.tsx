@@ -34,22 +34,17 @@ function renderFormChild<T>({
   onSubmit,
   handleSubmit,
   errors,
-  parent,
 }: RenderFormChildParams<T>): ReactNode | ReactNode[] {
+  if (typeof child === "string") return child;
+
   const nestedChildren =
     React.isValidElement(child) &&
     React.Children.toArray(child?.props.children);
 
   if (nestedChildren && nestedChildren.length) {
-    const parent = child;
-
-    const { ...parentProps } = parent?.props as {
-      children?: ReactNode;
-    };
-
     return React.createElement(
-      parent.type,
-      parentProps,
+      child.type,
+      child.props,
       React.Children.map(nestedChildren, (child: ReactNode) => {
         return renderFormChild({
           child,
@@ -57,7 +52,6 @@ function renderFormChild<T>({
           onSubmit,
           handleSubmit,
           errors,
-          parent,
         });
       }),
     );
@@ -93,13 +87,6 @@ function renderFormChild<T>({
     return React.createElement(child.type, {
       ...child.props,
       onPress: handleSubmit((values) => onSubmit?.(values as T)),
-      ref: undefined,
-    });
-  }
-
-  if (typeof child === "string" && React.isValidElement(parent)) {
-    return React.createElement(parent.type, {
-      ...parent.props,
       ref: undefined,
     });
   }

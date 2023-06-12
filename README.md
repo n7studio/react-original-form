@@ -77,14 +77,11 @@ function App() {
         password: "",
       }}
     >
+      <input name="fishName" placeholder="Fish name" />
       <MuiTextField type="text" name="firstName" />
-
       <MuiTextField type="text" name="lastName" />
-
       <MuiTextField type="email" name="email" />
-
       <MuiTextField type="password" name="password" />
-
       <input type="submit" value="submit" />
     </Form>
   );

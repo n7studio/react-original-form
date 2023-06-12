@@ -2,33 +2,50 @@ import React, {
   forwardRef,
   ReactNode,
   Ref,
+  useEffect,
   useImperativeHandle,
   useRef,
 } from "react";
 import { renderFormChild } from "../../utils";
-import { FieldValues, FormProvider, Resolver, useForm } from "react-hook-form";
+import {
+  FieldErrors,
+  FieldValues,
+  FormProvider,
+  Resolver,
+  useForm,
+} from "react-hook-form";
 import { useOnWatchForm } from "../../hooks";
+import * as yup from "yup";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { FormElement } from "../../types";
 
 type FormProps<T extends FieldValues> = {
   children: ReactNode | ReactNode[];
   onSubmit?: (values: T) => void;
   defaultValues?: T;
   resolver?: Resolver<FieldValues, any> | undefined;
+  validationSchema?: yup.AnyObjectSchema;
   mode?: "onBlur" | "onChange" | "onSubmit" | "onTouched" | "all";
   onWatch?: (values: T) => void;
   watch?: {
     fields?: string[];
     onChange: (value: Array<any> | T) => void;
   };
-};
-
-type FormRef = {
-  submit: () => void;
+  onInvalid?: (errors: FieldErrors<FieldValues>) => void;
 };
 
 function FormInner<T extends FieldValues>(
-  { children, onSubmit, defaultValues, resolver, mode, watch }: FormProps<T>,
-  ref?: Ref<FormRef>,
+  {
+    children,
+    onSubmit,
+    defaultValues,
+    resolver,
+    mode,
+    watch,
+    validationSchema,
+    onInvalid,
+  }: FormProps<T>,
+  ref?: Ref<FormElement>,
 ) {
   const {
     control,
@@ -40,7 +57,7 @@ function FormInner<T extends FieldValues>(
   } = useForm({
     mode: mode,
     defaultValues: defaultValues as FieldValues,
-    resolver: resolver,
+    resolver: resolver ?? (validationSchema && yupResolver(validationSchema)),
   });
 
   useOnWatchForm(
@@ -54,11 +71,6 @@ function FormInner<T extends FieldValues>(
   const formRef = useRef<HTMLFormElement>(null);
 
   useImperativeHandle(ref, () => ({
-    submit: () => handleSubmit((values) => onSubmit?.(values as T))(),
-    reset: (resetData: FieldValues) => reset(resetData),
-  }));
-
-  useImperativeHandle(ref, () => ({
     submit: () => {
       formRef?.current?.dispatchEvent(
         new Event("submit", { bubbles: true, cancelable: true }),
@@ -66,6 +78,12 @@ function FormInner<T extends FieldValues>(
     },
     reset: (resetData: FieldValues) => reset(resetData),
   }));
+
+  useEffect(() => {
+    if (!Object.keys(formState.errors).length) return;
+
+    onInvalid?.(formState.errors);
+  }, [JSON.stringify(formState.errors)]);
 
   return (
     <FormProvider
@@ -97,7 +115,7 @@ function FormInner<T extends FieldValues>(
 }
 
 const Form = forwardRef(FormInner) as <T extends FieldValues>(
-  props: FormProps<T> & { ref?: Ref<FormRef> },
+  props: FormProps<T> & { ref?: Ref<FormElement> },
 ) => ReturnType<typeof FormInner>;
 
 export default Form;
