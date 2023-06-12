@@ -17,7 +17,7 @@ import {
 import { useOnWatchForm } from "../../hooks";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { FormElement } from "../../types";
+import { FormRef } from "../../types";
 
 type FormProps<T extends FieldValues> = {
   children: ReactNode | ReactNode[];
@@ -45,7 +45,7 @@ function FormInner<T extends FieldValues>(
     validationSchema,
     onInvalid,
   }: FormProps<T>,
-  ref?: Ref<FormElement>,
+  ref?: Ref<FormRef>,
 ) {
   const {
     control,
@@ -76,7 +76,7 @@ function FormInner<T extends FieldValues>(
         new Event("submit", { bubbles: true, cancelable: true }),
       );
     },
-    reset: (resetData: FieldValues) => reset(resetData),
+    reset: (resetData?: FieldValues) => reset(resetData),
   }));
 
   useEffect(() => {
@@ -115,7 +115,7 @@ function FormInner<T extends FieldValues>(
 }
 
 const Form = forwardRef(FormInner) as <T extends FieldValues>(
-  props: FormProps<T> & { ref?: Ref<FormElement> },
+  props: FormProps<T> & { ref?: Ref<FormRef> },
 ) => ReturnType<typeof FormInner>;
 
 export default Form;
