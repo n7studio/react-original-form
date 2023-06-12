@@ -76,7 +76,7 @@ function FormInner<T extends FieldValues>(
         new Event("submit", { bubbles: true, cancelable: true }),
       );
     },
-    reset: (resetData: FieldValues) => reset(resetData),
+    reset: (resetData?: FieldValues) => reset(resetData),
   }));
 
   useEffect(() => {
