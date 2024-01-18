@@ -6,7 +6,7 @@ import React, {
   useImperativeHandle,
   useRef,
 } from "react";
-import { renderFormChild } from "../../utils";
+import { isBrowser, renderFormChild } from "../../utils";
 import {
   FieldErrors,
   FieldValues,
@@ -70,12 +70,29 @@ function FormInner<T extends FieldValues>(
 
   const formRef = useRef<HTMLFormElement>(null);
 
+  const handleOnSubmit = () => {
+    handleSubmit((values) => onSubmit?.(values as T))();
+  };
+
+  const handleRenderFormChild = () => {
+    return React.Children.map(children, (child: ReactNode) =>
+      renderFormChild({
+        child,
+        control,
+        onSubmit,
+        handleSubmit,
+        errors: formState.errors,
+      }),
+    );
+  };
+
   useImperativeHandle(ref, () => ({
-    submit: () => {
-      formRef?.current?.dispatchEvent(
-        new Event("submit", { bubbles: true, cancelable: true }),
-      );
-    },
+    submit: () =>
+      isBrowser()
+        ? formRef?.current?.dispatchEvent(
+            new Event("submit", { bubbles: true, cancelable: true }),
+          )
+        : handleOnSubmit(),
     reset: (resetData?: FieldValues) => reset(resetData),
   }));
 
@@ -96,20 +113,13 @@ function FormInner<T extends FieldValues>(
         ...rest,
       }}
     >
-      <form
-        ref={formRef}
-        onSubmit={handleSubmit((values) => onSubmit?.(values as T))}
-      >
-        {React.Children.map(children, (child: ReactNode) => {
-          return renderFormChild({
-            child,
-            control,
-            onSubmit,
-            handleSubmit,
-            errors: formState.errors,
-          });
-        })}
-      </form>
+      {isBrowser() ? (
+        <form ref={formRef} onSubmit={handleOnSubmit}>
+          {handleRenderFormChild()}
+        </form>
+      ) : (
+        handleRenderFormChild()
+      )}
     </FormProvider>
   );
 }
