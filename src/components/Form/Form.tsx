@@ -21,7 +21,7 @@ import { FormRef } from "../../types";
 
 type FormProps<T extends FieldValues> = {
   children: ReactNode | ReactNode[];
-  onSubmit?: (values: T) => void;
+  onSubmit?: (values: T, e?: React.BaseSyntheticEvent) => void;
   defaultValues?: T;
   resolver?: Resolver<FieldValues, any> | undefined;
   validationSchema?: yup.AnyObjectSchema;
@@ -31,7 +31,13 @@ type FormProps<T extends FieldValues> = {
     fields?: string[];
     onChange: (value: Array<any> | T) => void;
   };
-  onInvalid?: (errors: FieldErrors<FieldValues>) => void;
+  onErrorsUpdate?: (errors: FieldErrors<FieldValues>) => void;
+  onDirtyFields?: (dirtyFields: object) => void;
+  onValidate?: (isValid: boolean) => void;
+  htmlFormProps?: {
+    action?: string | undefined;
+    method?: string | undefined;
+  };
 };
 
 function FormInner<T extends FieldValues>(
@@ -43,7 +49,10 @@ function FormInner<T extends FieldValues>(
     mode,
     watch,
     validationSchema,
-    onInvalid,
+    htmlFormProps,
+    onErrorsUpdate,
+    onDirtyFields,
+    onValidate,
   }: FormProps<T>,
   ref?: Ref<FormRef>,
 ) {
@@ -71,7 +80,7 @@ function FormInner<T extends FieldValues>(
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleOnSubmit = () => {
-    handleSubmit((values) => onSubmit?.(values as T))();
+    handleSubmit((values, e) => onSubmit?.(values as T, e))();
   };
 
   const handleRenderFormChild = () => {
@@ -97,10 +106,16 @@ function FormInner<T extends FieldValues>(
   }));
 
   useEffect(() => {
-    if (!Object.keys(formState.errors).length) return;
-
-    onInvalid?.(formState.errors);
+    onErrorsUpdate?.(formState.errors);
   }, [JSON.stringify(formState.errors)]);
+
+  useEffect(() => {
+    onDirtyFields?.(formState.dirtyFields);
+  }, [JSON.stringify(formState.dirtyFields)]);
+
+  useEffect(() => {
+    onValidate?.(formState.isValid);
+  }, [formState.isValid]);
 
   return (
     <FormProvider
@@ -114,7 +129,7 @@ function FormInner<T extends FieldValues>(
       }}
     >
       {isBrowser() ? (
-        <form ref={formRef} onSubmit={handleOnSubmit}>
+        <form ref={formRef} onSubmit={handleOnSubmit} {...htmlFormProps}>
           {handleRenderFormChild()}
         </form>
       ) : (
