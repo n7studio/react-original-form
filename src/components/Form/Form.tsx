@@ -37,6 +37,7 @@ type FormProps<T extends FieldValues> = {
   htmlFormProps?: {
     action?: string | undefined;
     method?: string | undefined;
+    id?: string | undefined;
   };
 };
 
