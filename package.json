@@ -1,6 +1,6 @@
 {
   "name": "@n7studio/react-original-form",
-  "version": "1.4.0",
+  "version": "1.4.9",
   "description": "The form based on react hook form",
   "private": false,
   "main": "./dist/cjs/index.js",
