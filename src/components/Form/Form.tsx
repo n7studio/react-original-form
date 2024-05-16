@@ -63,6 +63,8 @@ function FormInner<T extends FieldValues>(
     formState,
     watch: baseWatch,
     reset,
+    setValue,
+    resetField,
     ...rest
   } = useForm({
     mode: mode,
@@ -100,10 +102,12 @@ function FormInner<T extends FieldValues>(
     submit: () =>
       isBrowser()
         ? formRef?.current?.dispatchEvent(
-            new Event("submit", { bubbles: true, cancelable: true }),
-          )
+          new Event("submit", { bubbles: true, cancelable: true }),
+        )
         : handleOnSubmit(),
-    reset: (resetData?: FieldValues) => reset(resetData),
+    reset: (resetData?: FieldValues, options?: Record<string, boolean>) => reset(resetData, options),
+    resetField: (name: string, options?: Record<string, boolean | any>) => resetField(name, options),
+    setValue: (name: string, value: any, config?: Object) => setValue(name, value, config)
   }));
 
   useEffect(() => {
