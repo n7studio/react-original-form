@@ -66,6 +66,8 @@ function FormInner<T extends FieldValues>(
     getValues,
     watch: baseWatch,
     reset,
+    setValue,
+    resetField,
     ...rest
   } = useForm({
     mode: mode,
@@ -107,7 +109,12 @@ function FormInner<T extends FieldValues>(
             new Event("submit", { bubbles: true, cancelable: true }),
           )
         : handleOnSubmit(),
-    reset: (resetData?: FieldValues) => reset(resetData),
+    reset: (resetData?: FieldValues, options?: Record<string, boolean>) =>
+      reset(resetData, options),
+    resetField: (name: string, options?: Record<string, boolean | any>) =>
+      resetField(name, options),
+    setValue: (name: string, value: any, config?: object) =>
+      setValue(name, value, config),
   }));
 
   useEffect(() => {
@@ -130,6 +137,8 @@ function FormInner<T extends FieldValues>(
         watch: baseWatch,
         formState,
         getValues,
+        setValue,
+        resetField,
         reset,
         ...rest,
       }}
