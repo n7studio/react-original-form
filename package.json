@@ -1,6 +1,6 @@
 {
   "name": "@n7studio/react-original-form",
-  "version": "1.4.10",
+  "version": "1.5.9",
   "description": "The form based on react hook form",
   "private": false,
   "main": "./dist/cjs/index.js",
@@ -52,11 +52,11 @@
     "yup": "^0.32.11"
   },
   "peerDependencies": {
+    "@hookform/resolvers": "^3.1.0",
     "react": "^17 || ^18",
     "react-dom": "^17 || ^18",
     "react-hook-form": "^7.43.7",
-    "yup": "^0.32.11",
-    "@hookform/resolvers": "^3.1.0"
+    "yup": "^0.32.11"
   },
   "keywords": [
     "react",
@@ -72,9 +72,6 @@
     "*.{js,jsx,ts,tsx}": [
       "yarn lint --fix"
     ],
-    "**/*": "prettier --write --ignore-unknown",
-    "yarn.lock": [
-      "npx yarn-deduplicate"
-    ]
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
