@@ -19,6 +19,12 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { FormRef } from "../../types";
 
+interface htmlFormProps extends React.HTMLProps<HTMLFormElement> {
+  action?: string | undefined;
+  method?: string | undefined;
+  id?: string | undefined;
+}
+
 type FormProps<T extends FieldValues> = {
   children: ReactNode | ReactNode[];
   onSubmit?: (values: T, e?: React.BaseSyntheticEvent) => void;
@@ -34,11 +40,7 @@ type FormProps<T extends FieldValues> = {
   onErrorsUpdate?: (errors: FieldErrors<FieldValues>) => void;
   onDirtyFields?: (dirtyFields: object) => void;
   onValidate?: (isValid: boolean) => void;
-  htmlFormProps?: {
-    action?: string | undefined;
-    method?: string | undefined;
-    id?: string | undefined;
-  };
+  htmlFormProps?: htmlFormProps;
 };
 
 function FormInner<T extends FieldValues>(
@@ -61,6 +63,7 @@ function FormInner<T extends FieldValues>(
     control,
     handleSubmit,
     formState,
+    getValues,
     watch: baseWatch,
     reset,
     ...rest
@@ -80,7 +83,8 @@ function FormInner<T extends FieldValues>(
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const handleOnSubmit = () => {
+  const handleOnSubmit = (event?: any) => {
+    event?.preventDefault();
     handleSubmit((values, e) => onSubmit?.(values as T, e))();
   };
 
@@ -125,6 +129,7 @@ function FormInner<T extends FieldValues>(
         control,
         watch: baseWatch,
         formState,
+        getValues,
         reset,
         ...rest,
       }}
